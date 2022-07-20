@@ -5,6 +5,7 @@ export class AuthController {
   static async checkUser(req: Request, res: Response) {
     const { name, password } = req.body;
     const response = await AuthService.checkUser(name, password);
+
     if (response) {
       res.status(200).json(response);
     }

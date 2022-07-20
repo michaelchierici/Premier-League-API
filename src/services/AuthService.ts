@@ -1,6 +1,8 @@
 import { getRepository } from "typeorm";
 import { Coach } from "../entity/Coach";
+import { sign } from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
+import { JWT_CONFIG } from "../../enviroments/enviroment";
 
 export class AuthService {
   static async checkUser(name: any, password: any) {
@@ -20,6 +22,18 @@ export class AuthService {
       console.log("credenciais inválidas");
       return;
     }
-    return user;
+
+    const token = AuthService.generateToken(user?.id);
+
+    return { user, token };
+  }
+
+  static generateToken(userId: number) {
+    const token = sign({ id: userId }, JWT_CONFIG.jwtSecret, {
+      subject: String(userId),
+      expiresIn: JWT_CONFIG.jwtSecretExpiresIn,
+    });
+
+    return token;
   }
 }
