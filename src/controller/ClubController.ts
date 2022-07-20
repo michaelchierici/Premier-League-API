@@ -21,6 +21,7 @@ export class ClubController {
     const response = await ClubService.findOne(id);
     res.status(200).json(response);
   }
+
   static async update(req: Request, res: Response) {
     console.log(res);
   }

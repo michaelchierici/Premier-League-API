@@ -17,6 +17,9 @@ export class Player {
   @Column()
   name: string;
 
+  @Column()
+  number: number;
+
   @ManyToOne(() => Club, (club) => club.players)
   club: Club[];
 

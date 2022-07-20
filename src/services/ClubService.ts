@@ -1,7 +1,8 @@
-import { DeepPartial, getRepository } from "typeorm";
+import { getRepository } from "typeorm";
 import { Club } from "../entity/Club";
 import { Coach } from "../entity/Coach";
 import { League } from "../entity/League";
+import { Player } from "../entity/Player";
 
 export class ClubService {
   static async create(name: string, coach: Coach, league: League) {

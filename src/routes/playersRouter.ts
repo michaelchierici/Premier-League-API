@@ -7,10 +7,8 @@ playersRouter.post("/", PlayersController.create);
 
 playersRouter.get("/", PlayersController.findAll);
 
-playersRouter.get("/:id", PlayersController.findById);
+playersRouter.get("/:clubId", PlayersController.findClubPlayers);
 
-playersRouter.patch("/:id", PlayersController.update);
-
-playersRouter.delete("/:id", PlayersController.delete);
+playersRouter.patch("/:playerId/:clubId", PlayersController.updateClub);
 
 export { playersRouter };
