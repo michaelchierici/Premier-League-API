@@ -13,6 +13,7 @@ import {
 import { coachRouter } from "../routes/coachRouter";
 import { Club } from "./Club";
 import * as bcrypt from "bcrypt";
+import { RefreshToken } from "./RefreshToken";
 
 @Entity("Coach")
 export class Coach {
@@ -24,6 +25,9 @@ export class Coach {
 
   @Column()
   password: string;
+
+  @OneToOne(() => RefreshToken, (token) => token.coach)
+  refreshToken: RefreshToken;
 
   @OneToOne(() => Club, (club) => club.coach)
   @JoinColumn()
