@@ -16,7 +16,7 @@ export class RefreshToken {
   id: string;
 
   @Column()
-  experesIn: number;
+  expiresIn: number;
 
   @Column()
   @CreateDateColumn()
@@ -24,7 +24,7 @@ export class RefreshToken {
 
   @OneToOne(() => Coach, (coach) => coach.refreshToken)
   @JoinColumn()
-  coach: Coach;
+  user: Coach;
 
   @Column()
   @UpdateDateColumn()

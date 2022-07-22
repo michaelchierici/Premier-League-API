@@ -1,6 +1,5 @@
 import {
   BeforeInsert,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -10,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { coachRouter } from "../routes/coachRouter";
+import { coachRouter } from "../routes/private/coachRouter";
 import { Club } from "./Club";
 import * as bcrypt from "bcrypt";
 import { RefreshToken } from "./RefreshToken";
@@ -26,7 +25,7 @@ export class Coach {
   @Column()
   password: string;
 
-  @OneToOne(() => RefreshToken, (token) => token.coach)
+  @OneToOne(() => RefreshToken, (token) => token.user)
   refreshToken: RefreshToken;
 
   @OneToOne(() => Club, (club) => club.coach)

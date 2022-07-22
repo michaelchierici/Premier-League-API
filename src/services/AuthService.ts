@@ -4,10 +4,11 @@ import { sign } from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import { JWT_CONFIG } from "../../enviroments/enviroment";
 import { RefreshToken } from "../entity/RefreshToken";
-import dayjs from "dayjs";
+import dayjs, { unix } from "dayjs";
+import { AppError } from "../@types/AppError";
 
 export class AuthService {
-  static async checkUser(name: any, password: any) {
+  static async login(name: any, password: any) {
     const userRepository = getRepository(Coach);
 
     const user = await userRepository.findOne({
@@ -42,25 +43,57 @@ export class AuthService {
   }
   static async generateRefreshToken(userId: number | string) {
     const refreshTokenRepository = getRepository(RefreshToken);
-    const experesIn = dayjs()
-      .add(JWT_CONFIG.jwtSecretExpiresIn - 60, "seconds")
+    const expiresIn = dayjs()
+      .add(JWT_CONFIG.jwtSecretExpiresIn, "seconds")
       .unix();
 
     const refreshToken = await refreshTokenRepository.findOne({
-      where: { coach: { id: userId } },
+      where: { user: { id: userId } },
     });
 
     if (refreshToken) {
-      refreshTokenRepository.merge(refreshToken, { experesIn });
+      refreshTokenRepository.merge(refreshToken, { expiresIn });
       await refreshTokenRepository.save(refreshToken);
       return refreshToken;
     }
     const newRefreshToken = refreshTokenRepository.create({
-      coach: { id: Number(userId) },
-      experesIn,
+      user: { id: Number(userId) },
+      expiresIn,
     });
     await refreshTokenRepository.save(newRefreshToken);
 
     return refreshToken;
+  }
+
+  static async generateTokenFromRefreshToken(refreshTokenId: any) {
+    const refreshTokenRepository = getRepository(RefreshToken);
+
+    const refreshToken = await refreshTokenRepository.findOne({
+      where: { id: refreshTokenId },
+      relations: ["user"],
+    });
+
+    if (!refreshToken) {
+      throw new AppError(401, "error");
+    }
+
+    const token = AuthService.generateToken(refreshTokenId.user);
+
+    const isRefreshTokenExpired = dayjs
+      .unix(refreshToken.expiresIn)
+      .isAfter(dayjs());
+
+    const expiresIn = dayjs()
+      .add(JWT_CONFIG.jwtSecretExpiresIn, "seconds")
+      .unix();
+
+    if (isRefreshTokenExpired) {
+      throw new AppError(403, "error");
+    }
+
+    refreshTokenRepository.merge(refreshToken, { expiresIn });
+    await refreshTokenRepository.save(refreshToken);
+    console.log(refreshToken);
+    return { token, refreshToken, user: refreshToken.user };
   }
 }
